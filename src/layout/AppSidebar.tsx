@@ -18,6 +18,7 @@ import {
   UserCircleIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
+// import ThemeTogglerTwo from "@/components/common/ThemeTogglerTwo";
 
 type NavItem = {
   name: string;
@@ -30,19 +31,18 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
-  },
-  {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
+    path: "/",
   },
   {
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/profile",
   },
-
+  {
+    icon: <CalenderIcon />,
+    name: "Calendar",
+    path: "/calendar",
+  },
   {
     name: "Forms",
     icon: <ListIcon />,
@@ -308,33 +308,40 @@ const AppSidebar: React.FC = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link href="/">
-          {isExpanded || isHovered || isMobileOpen ? (
-            <>
-              <Image
-                className="dark:hidden"
-                src="/images/logo/logo.svg"
-                alt="Logo"
-                width={150}
-                height={40}
-              />
-              <Image
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
-                alt="Logo"
-                width={150}
-                height={40}
-              />
-            </>
-          ) : (
-            <Image
-              src="/images/logo/logo-icon.svg"
-              alt="Logo"
-              width={32}
-              height={32}
-            />
-          )}
-        </Link>
+       <div className="flex items-center justify-between w-full">
+  {/* Left Side */}
+  <Link href="/" className="flex items-center gap-2">
+    {isExpanded || isHovered || isMobileOpen ? (
+      <>
+        <Image
+          className="dark:hidden"
+          src="/images/logo/logo-02.png"
+          alt="Logo"
+          width={40}
+          height={30}
+        />
+        <Image
+          className="hidden dark:block"
+          src="/images/logo/logo-02.png"
+          alt="Logo"
+          width={40}
+          height={30}
+        />
+      </>
+    ) : (
+      <Image
+        src="/images/logo/logo-02.png"
+        alt="Logo"
+        width={32}
+        height={32}
+      />
+    )}
+    <span className="font-semibold text-xm text-yellow-400">IT Solutions</span>
+  </Link>
+
+  
+</div>
+
       </div>
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
