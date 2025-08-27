@@ -5,10 +5,76 @@ import Label from "@/components/form/Label";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
 import React, { useState } from "react";
+import PANCHAYATHS from "@/constants/panchayaths";
+import axios from "axios";
+
+
+type ValidationError = {
+  type: string;
+  value: string;
+  msg: string;
+  path: string;
+  location: string;
+};
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [errorData, setErrorData] = useState<{ [key: string]: string } | null>(null);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      setErrorData({})
+
+      const form = e.currentTarget;
+      const formData = new FormData(form)
+      console.log(formData)
+      const payload = {
+          email: formData.get("email"),
+          panchayath: formData.get("panchayath"),
+          password: formData.get("password"),
+          phone: formData.get("phone"),
+          name: formData.get("name"),
+          role: "distributor"
+      };
+
+       try {
+
+          
+          const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+          const res = await axios.post(`${baseURL}/auth/register`, payload); // 🔹 change URL to your backend API
+          console.log("Success:", res);
+
+         
+
+
+          alert("Signup successful!");
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+              console.log("dddd:", err.response?.data);
+
+              if (err.response?.data?.status === "fail") {
+                const errors: ValidationError[] = err.response?.data.error;
+                console.log("errors:", errors);
+
+                const errorObject = errors.reduce((acc, e) => {
+                  acc[e.path] = e.msg;
+                  return acc;
+                }, {} as Record<string, string>);
+
+                setErrorData(errorObject);
+                return;
+              }
+
+              console.error("Error:", err.response?.data || err.message);
+            } else {
+              console.error("Unknown error:", err);
+            }
+            alert("Signup failed. Please try again.");
+          }
+
+    }
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full overflow-y-auto no-scrollbar">
       <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
@@ -83,32 +149,38 @@ export default function SignUpForm() {
                 </span>
               </div>
             </div>
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="space-y-5">
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {/* <!-- First Name --> */}
                   <div className="sm:col-span-1">
                     <Label>
-                      First Name<span className="text-error-500">*</span>
+                      Name<span className="text-error-500">*</span>
                     </Label>
                     <Input
                       type="text"
-                      id="fname"
-                      name="fname"
-                      placeholder="Enter your first name"
+                      id="name"
+                      name="name"
+                      placeholder="Enter your name"
                     />
+                    {errorData && errorData.name && (
+                    <p className="mt-1 text-sm text-error-500">{errorData.name}</p>
+                  )}
                   </div>
                   {/* <!-- Last Name --> */}
                   <div className="sm:col-span-1">
                     <Label>
-                      Last Name<span className="text-error-500">*</span>
+                      Phone<span className="text-error-500">*</span>
                     </Label>
                     <Input
                       type="text"
-                      id="lname"
-                      name="lname"
-                      placeholder="Enter your last name"
+                      id="phone"
+                      name="phone"
+                      placeholder="Enter your phone number"
                     />
+                    {errorData && errorData.phone && (
+                    <p className="mt-1 text-sm text-error-500">{errorData.phone}</p>
+                  )}
                   </div>
                 </div>
                 {/* <!-- Email --> */}
@@ -122,6 +194,33 @@ export default function SignUpForm() {
                     name="email"
                     placeholder="Enter your email"
                   />
+                  {errorData && errorData.email && (
+                    <p className="mt-1 text-sm text-error-500">{errorData.email}</p>
+                  )}
+                </div>
+                <div>
+                  
+                  <Label>
+                    Designated Panchayath<span className="text-error-500">*</span>
+                  </Label>
+                  <select
+                    className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-gray-900 dark:text-white"
+                    id="panchayath"
+                    name="panchayath">
+                    <option value="" disabled selected>
+                      Select your panchayath
+                    </option>
+                    {Object.entries(PANCHAYATHS).map(([code, name]) => (
+                      <option key={code} value={code}>
+                        {name}
+                      </option>
+                    ))}
+                                      
+                    {/* Add more options as needed */}
+                  </select>
+                  {errorData && errorData.panchayath && (
+                    <p className="mt-1 text-sm text-error-500">{errorData.panchayath}</p>
+                  )}
                 </div>
                 {/* <!-- Password --> */}
                 <div>
@@ -132,7 +231,11 @@ export default function SignUpForm() {
                     <Input
                       placeholder="Enter your password"
                       type={showPassword ? "text" : "password"}
+                      name="password"
                     />
+                    {errorData && errorData.password && (
+                    <p className="mt-1 text-sm text-error-500">{errorData.password}</p>
+                  )}
                     <span
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
@@ -145,6 +248,7 @@ export default function SignUpForm() {
                     </span>
                   </div>
                 </div>
+               
                 {/* <!-- Checkbox --> */}
                 <div className="flex items-center gap-3">
                   <Checkbox
@@ -165,7 +269,7 @@ export default function SignUpForm() {
                 </div>
                 {/* <!-- Button --> */}
                 <div>
-                  <button className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
+                  <button className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600" type="submit">
                     Sign Up
                   </button>
                 </div>
