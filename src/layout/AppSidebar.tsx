@@ -16,6 +16,7 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
+  UserIcon
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
 // import ThemeTogglerTwo from "@/components/common/ThemeTogglerTwo";
@@ -37,6 +38,11 @@ const navItems: NavItem[] = [
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/profile",
+  },
+    {
+    icon: <UserIcon />,
+    name: "Team Members",
+    path: "/",
   },
   {
     icon: <CalenderIcon />,
